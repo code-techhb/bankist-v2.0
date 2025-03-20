@@ -9,6 +9,10 @@ const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const header = document.querySelector('.header');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const tabs = document.querySelectorAll('.operations');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+const nav = document.querySelector('.nav');
 
 const openModal = function (e) {
   e.preventDefault();
@@ -34,39 +38,77 @@ document.addEventListener('keydown', function (e) {
 // Button learn more scroll
 btnScrollTo.addEventListener('click', (e) => {
   const s1coordinates = section1.getBoundingClientRect();
-  // scrolling with behavior defined
   window.scrollTo({
     left: s1coordinates.left + window.scrollX,
     top: s1coordinates.top + window.scrollY,
     behavior: 'smooth',
   });
-  // scrolling in modern way
-  // section1.scrollIntoView({ behavior: 'smooth' });
 });
 
 // Event delegation
 document.querySelector('.nav__link').addEventListener('click', function (e) {
-  // matching strategy
   if (e.target.classList.contains('nav__link')) {
     e.preventDefault();
-    // smooth scrolling
     const id = e.target.getAttribute('href');
     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
   }
 });
 
-// Cookie msg
-const msg = document.createElement('div');
-msg.classList.add('cookie-message');
-msg.innerHTML = `We use cookies for improved functionality and analytics <button class="btn btn--close-cookie">Got it!</button>`;
-header.append(msg);
-header.before(msg);
-document.querySelector('.btn--close-cookie').addEventListener('click', () => {
-  msg.remove();
+// Tab
+tabsContainer.addEventListener('click', function (e) {
+  const clicked = e.target.closest('.operations__tab');
+  if (!clicked) return; //Guard clause
+  // remove active classes
+  tabs.forEach((tab) => tab.classList.remove('operations__tab--active'));
+  tabsContent.forEach((content) =>
+    content.classList.remove('operations__content--active')
+  );
+  // add active classes
+  clicked.classList.add('operations__tab--active');
+  document
+    .querySelector(`.operations__content--${clicked.dataset.tab}`)
+    .classList.add('operations__content--active');
 });
-msg.style.backgroundColor = '#37383d';
-msg.style.width = '120%';
-msg.style.height = Number.parseFloat(getComputedStyle(msg).height) + 30 + 'px';
+
+// Menu fade animation
+const handleHover = function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach((element) => {
+      if (element !== link) element.style.opacity = this;
+      logo.style.opacity = this;
+    });
+  }
+};
+// method 2:
+// nav.addEventListener('mouseover', function (e) {
+//   handleHover(e, 0.5);
+// });
+
+// method 3: passing "arguments" into handler functions
+nav.addEventListener('mouseover', handleHover.bind(0.4));
+nav.addEventListener('mouseout', handleHover.bind(1));
+
+// sticky Nav
+const navHeight = nav.getBoundingClientRect().height;
+const stickyNav = function (entries) {
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) {
+    nav.classList.add('sticky');
+  } else {
+    nav.classList.remove('sticky');
+  }
+};
+const headerObserver = new IntersectionObserver(stickyNav, {
+  root: null,
+  threshold: [0],
+  rootMargin: `-${navHeight}px`, //height of the nav
+});
+headerObserver.observe(header);
 
 ////////////////////////////////////////////////////////////
 ////////////////////// Lecture notes ////////////////////
@@ -99,3 +141,34 @@ msg.style.height = Number.parseFloat(getComputedStyle(msg).height) + 30 + 'px';
 //   this.style.backgroundColor = randomColor();
 //   console.log('link', e.target, e.currentTarget);
 // });
+
+// //  Dom Traversing
+// const h1 = document.querySelector('h1');
+// // downward > child element
+// console.log(h1.querySelectorAll('.highlight'));
+// console.log(h1.childNodes); //gives direct children of the element including comments, text, etc
+// console.log(h1.children);
+// h1.firstElementChild.style.color = 'red';
+// h1.lastElementChild.style.color = 'blue';
+
+// // selecting parents
+// console.log(h1.parentNode);
+// console.log(h1.parentElement);
+// h1.closest('.header').style.background = 'var(--gradient-secondary) '; //closest parent elements no matter how far they are
+
+// // finding siblings
+// console.log(h1.previousElementSibling);
+// console.log(h1.nextElementSibling);
+
+// console.log(h1.previousSibling);
+// console.log(h1.nextSibling);
+
+// // need all sibling
+// console.log(h1.parentElement.children); //all sibling of the h1 element
+
+// // using css and dom traversing
+// const arr = [...h1.parentElement.children].forEach((el) => {
+//   if (el != h1) {
+//     el.style.transform = 'scale(0.5)';
+//   }
+// })
