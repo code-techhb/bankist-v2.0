@@ -83,12 +83,6 @@ const handleHover = function (e) {
     });
   }
 };
-// method 2:
-// nav.addEventListener('mouseover', function (e) {
-//   handleHover(e, 0.5);
-// });
-
-// method 3: passing "arguments" into handler functions
 nav.addEventListener('mouseover', handleHover.bind(0.4));
 nav.addEventListener('mouseout', handleHover.bind(1));
 
@@ -106,10 +100,29 @@ const stickyNav = function (entries) {
 const headerObserver = new IntersectionObserver(stickyNav, {
   root: null,
   threshold: [0],
-  rootMargin: `-${navHeight}px`, //height of the nav
+  rootMargin: `-${navHeight}px`,
 });
 headerObserver.observe(header);
 
+// reveal on scroll
+const allSections = document.querySelectorAll('.section');
+const revealSection = function (entries, observer) {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.remove('section--hidden');
+    observer.unobserve(entry.target);
+  });
+};
+
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+
+allSections.forEach(function (section) {
+  sectionObserver.observe(section);
+  section.classList.add('section--hidden');
+});
 ////////////////////////////////////////////////////////////
 ////////////////////// Lecture notes ////////////////////
 
