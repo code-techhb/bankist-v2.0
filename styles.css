@@ -674,15 +674,3 @@ h4 {
   visibility: hidden;
   opacity: 0;
 }
-
-/* COOKIE MESSAGE */
-.cookie-message {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  width: 100%;
-  background-color: var(--color-text-white);
-  color: var(--color-gray-light);
-  font-size: 1.5rem;
-  font-weight: 400;
-}
