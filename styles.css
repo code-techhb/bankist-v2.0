@@ -473,7 +473,6 @@ h4 {
 }
 
 .dots__dot--active {
-  /* background-color: #fff; */
   background-color: var(--color-gray-medium);
   opacity: 1;
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 ///////////////////////////////////////
-// Modal window
+// ------------------- Elements  --------------------------
 const modal = document.querySelector('.modal');
 const overlay = document.querySelector('.overlay');
 const btnCloseModal = document.querySelector('.btn--close-modal');
@@ -13,7 +13,13 @@ const tabs = document.querySelectorAll('.operations');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
 const nav = document.querySelector('.nav');
+const imgTargets = document.querySelectorAll('img[data-src]');
+const slides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+const dotContainer = document.querySelector('.dots');
 
+// ------------------- Modal --------------------------
 const openModal = function (e) {
   e.preventDefault();
   modal.classList.remove('hidden');
@@ -35,7 +41,7 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-// Button learn more scroll
+// ------------------- btn Learn more scroll --------------------------
 btnScrollTo.addEventListener('click', (e) => {
   const s1coordinates = section1.getBoundingClientRect();
   window.scrollTo({
@@ -54,7 +60,7 @@ document.querySelector('.nav__link').addEventListener('click', function (e) {
   }
 });
 
-// Tab
+// ------------------- Tabs --------------------------
 tabsContainer.addEventListener('click', function (e) {
   const clicked = e.target.closest('.operations__tab');
   if (!clicked) return; //Guard clause
@@ -70,7 +76,7 @@ tabsContainer.addEventListener('click', function (e) {
     .classList.add('operations__content--active');
 });
 
-// Menu fade animation
+// ------------------- Menu fade effect --------------------------
 const handleHover = function (e) {
   if (e.target.classList.contains('nav__link')) {
     const link = e.target;
@@ -86,7 +92,7 @@ const handleHover = function (e) {
 nav.addEventListener('mouseover', handleHover.bind(0.4));
 nav.addEventListener('mouseout', handleHover.bind(1));
 
-// sticky Nav
+// ------------------- Sticky Nav --------------------------
 const navHeight = nav.getBoundingClientRect().height;
 const stickyNav = function (entries) {
   const [entry] = entries;
@@ -124,9 +130,7 @@ allSections.forEach(function (section) {
   section.classList.add('section--hidden');
 });
 
-// lazy loading images
-const imgTargets = document.querySelectorAll('img[data-src]');
-
+// ------------------- Lazy loading images --------------------------
 // call back function
 const loadImg = function (entries, observer) {
   const [entry] = entries;
@@ -147,6 +151,83 @@ const imgObserver = new IntersectionObserver(loadImg, {
 });
 
 imgTargets.forEach((img) => imgObserver.observe(img));
+
+// ------------------- slider --------------------------
+const slider = function () {
+  let currentSlide = 0;
+  const maxSlide = slides.length;
+
+  // functions
+  const goToSlide = function (slide) {
+    slides.forEach(
+      (s, i) => (s.style.transform = `translateX(${100 * (i - currentSlide)}%)`)
+    );
+  };
+
+  const createDots = function () {
+    slides.forEach(function (_, i) {
+      dotContainer.insertAdjacentHTML(
+        'beforeend',
+        `<button class="dots__dot" data-slide="${i}"></button>`
+      );
+    });
+  };
+  const nextSlide = function () {
+    if (currentSlide === maxSlide - 1) {
+      currentSlide = 0;
+    } else {
+      currentSlide++;
+    }
+    goToSlide(currentSlide);
+    activateDot(currentSlide);
+  };
+
+  const prevSlide = function () {
+    if (currentSlide === 0) {
+      currentSlide = maxSlide - 1;
+    } else {
+      currentSlide--;
+    }
+    goToSlide(currentSlide);
+    activateDot(currentSlide);
+  };
+
+  const activateDot = function (slide) {
+    document
+      .querySelectorAll('.dots__dot')
+      .forEach((dot) => dot.classList.remove('dots__dot--active'));
+    document
+      .querySelector(`.dots__dot[data-slide="${slide}"]`)
+      .classList.add('dots__dot--active');
+  };
+
+  const init = function () {
+    goToSlide(0);
+    createDots();
+    activateDot(0);
+  };
+
+  // initialiaze
+  init();
+
+  // events listeners
+  btnRight.addEventListener('click', nextSlide);
+  btnLeft.addEventListener('click', prevSlide);
+  document.addEventListener('keydown', function (e) {
+    e.key === 'ArrowRight' && nextSlide();
+    e.key === 'ArrowLeft' && prevSlide();
+  });
+  dotContainer.addEventListener('click', function (e) {
+    if (e.target.classList.contains('dots__dot')) {
+      currentSlide = Number(e.target.dataset.slide);
+      goToSlide(currentSlide);
+      activateDot(currentSlide);
+    }
+  });
+};
+
+slider();
+
 ////////////////////////////////////////////////////////////
 ////////////////////// Lecture notes ////////////////////
 
